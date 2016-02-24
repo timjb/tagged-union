@@ -15,16 +15,14 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Lib
-  build-depends:       base >= 4.7 && < 5
-  default-language:    Haskell2010
-
-executable tagged-union-exe
-  hs-source-dirs:      app
-  main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
-  build-depends:       base
-                     , tagged-union
+  exposed-modules:     Data.TaggedUnion,
+                       Data.TaggedUnion.Internal,
+                       Data.TaggedUnion.TypeLevel
+  build-depends:       base >= 4.7 && < 5,
+                       ghc-prim,
+                       profunctors,
+                       hvect,
+                       vector
   default-language:    Haskell2010
 
 test-suite tagged-union-test
@@ -33,6 +31,9 @@ test-suite tagged-union-test
   main-is:             Spec.hs
   build-depends:       base
                      , tagged-union
+                     , hvect
+                     , HTF
+                     , lens
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
