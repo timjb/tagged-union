@@ -23,6 +23,7 @@ inject :: Elem x xs => x -> Proxy xs -> TUnion xs
 inject (v :: x) xsProxy =
   let i = elemIndex (Proxy :: Proxy x) xsProxy
   in TUnion i (unsafeCoerce v)
+{-# INLINE inject #-}
 
 project :: Elem x xs => Proxy x -> TUnion xs -> Maybe x
 project (Proxy :: Proxy x) (TUnion i v :: TUnion xs) =
@@ -39,11 +40,17 @@ unionPrism xsProxy (g :: p x (f x)) =
     prism bt seta = dimap seta (either pure (fmap bt)) . right'
     prism' bs sma = prism bs (\s -> maybe (Left s) Right (sma s))
 
+unsafeCoerceAll :: HVect as -> [b]
+unsafeCoerceAll HNil = []
+unsafeCoerceAll (f :&: fs) = unsafeCoerce f : unsafeCoerceAll fs
+{-# INLINE unsafeCoerceAll #-}
+
+elimWithFunctionTable :: V.Vector (Any -> a) -> TUnion xs -> a
+elimWithFunctionTable functionTable (TUnion i v) =
+  (V.unsafeIndex functionTable i) v
+{-# INLINE elimWithFunctionTable #-}
+
 elim :: HVect (Elims xs a) -> TUnion xs -> a
-elim eliminators (TUnion i v) = 
-  let functionTable = V.fromList (unsafeCoerceAll eliminators)
-  in (V.unsafeIndex functionTable i) v
-  where
-    unsafeCoerceAll :: HVect as -> [b]
-    unsafeCoerceAll HNil = []
-    unsafeCoerceAll (f :&: fs) = unsafeCoerce f : unsafeCoerceAll fs
+elim eliminators =
+  elimWithFunctionTable (V.fromList (unsafeCoerceAll eliminators))
+{-# INLINE elim #-}

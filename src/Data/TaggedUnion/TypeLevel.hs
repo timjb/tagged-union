@@ -48,13 +48,3 @@ instance {-# OVERLAPPABLE #-} (NotEq x y, Elem x xs) => Elem x (y ': xs) where
 type family Elims (xs :: [*]) (a :: *) :: [*] where
   Elims '[] a = '[]
   Elims (x ': xs) a = (x -> a) ': (Elims xs a)
-  
-
-{-
-type family ElemB (x :: k) (xs :: [k]) :: Bool where
-  ElemB x '[]       = False
-  ElemB x (x ': xs) = True
-  ElemB y (x ': xs) = ElemB y xs
-
-type Elem x xs = ElemB x xs ?? '(x, " is not an element of ", xs)
--}
